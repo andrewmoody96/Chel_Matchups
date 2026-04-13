@@ -662,23 +662,46 @@ function pickRandom(arr, n) {
 
 function pickEvenMatchups(teams, numMatchups) {
   const sorted = [...teams].sort((a, b) => b.ptsPercent - a.ptsPercent);
+  
+  // Split into thirds (top, mid, bottom)
+  const tierSize = Math.ceil(sorted.length / 3);
+  const tiers = [
+    sorted.slice(0, tierSize),
+    sorted.slice(tierSize, tierSize * 2),
+    sorted.slice(tierSize * 2)
+  ];
+
+  // Shuffle each tier
+  tiers.forEach(tier => {
+    for (let i = tier.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [tier[i], tier[j]] = [tier[j], tier[i]];
+    }
+  });
+
+  // Pull pairs from randomly selected tiers
   const matchups = [];
   const used = new Set();
 
-  for (let i = 0; i < sorted.length && matchups.length < numMatchups; i++) {
-    if (used.has(i)) continue;
-    let bestJ = -1, bestDiff = Infinity;
-    for (let j = i + 1; j < sorted.length; j++) {
-      if (used.has(j)) continue;
-      const diff = Math.abs(sorted[i].ptsPercent - sorted[j].ptsPercent);
-      if (diff < bestDiff) { bestDiff = diff; bestJ = j; }
-    }
-    if (bestJ !== -1) {
-      used.add(i); used.add(bestJ);
-      matchups.push([sorted[i], sorted[bestJ]]);
-    }
+  while (matchups.length < numMatchups) {
+    // Pick a random tier that has at least 2 unused teams
+    const validTiers = tiers.filter(tier =>
+      tier.filter(t => !used.has(t.name)).length >= 2
+    );
+    if (!validTiers.length) break;
+
+    const tier = validTiers[Math.floor(Math.random() * validTiers.length)];
+    const available = tier.filter(t => !used.has(t.name));
+    const a = available[Math.floor(Math.random() * available.length)];
+    const remaining = available.filter(t => t.name !== a.name);
+    const b = remaining[Math.floor(Math.random() * remaining.length)];
+
+    used.add(a.name);
+    used.add(b.name);
+    matchups.push([a, b]);
   }
-  return matchups.slice(0, numMatchups);
+
+  return matchups;
 }
 
 // ─── Render results ───────────────────────────────────────────────────
