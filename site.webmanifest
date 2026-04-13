@@ -1,7 +1,7 @@
 {
   "name": "Chel Matchup Generator",
   "short_name": "Chel",
-  "start_url": "/",
+  "start_url": "https://andrewmoody96.github.io/Chel_Matchups/",
   "icons": [
     { "src": "android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
