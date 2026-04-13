@@ -575,7 +575,7 @@ async function fetchStandings(seasonYear) {
   let lastErr;
   for (const url of urls) {
     try {
-      const res = await fetch(url);
+      const res = await fetch(`https://corsproxy.io/?url=${encodeURIComponent(url)}`);
       if (!res.ok) { lastErr = new Error(`HTTP ${res.status}`); continue; }
       const data = await res.json();
       const standings = data.standings;
